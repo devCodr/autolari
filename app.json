@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "AutoLari",
+    "slug": "autolari",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.autolari.app",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio"
+        ],
+        "AVInitialRouteSharingPolicy": "longFormAudio"
+      }
+    },
+    "android": {
+      "package": "com.autolari.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#080A0E",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "INTERNET",
+        "WAKE_LOCK",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ],
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-video",
+        {
+          "supportsBackgroundPlayback": true,
+          "supportsPictureInPicture": true
+        }
+      ],
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "3b891e5d-d015-44eb-ba0f-be690203e340"
+      }
+    }
+  }
+}
