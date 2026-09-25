@@ -1,39 +1,67 @@
-https://raw.githubusercontent.com/teleonline/listas/main/tv.json
-https://www.tdtchannels.com/lists/tv.json
+# 📺 AutoLari - Catálogo de Fuentes Multimedia
 
-## Fuentes Oficiales IPTV-Org (Compatibles con AutoLari)
+> Colección oficial de fuentes M3U, M3U8, JSON y streams directos compatibles con **AutoLari**.
 
-AutoLari detecta automáticamente enlaces de GitHub (`github.com/iptv-org/iptv#playlists` o `PLAYLISTS.md`) y los convierte a las listas M3U oficiales:
+---
 
-### Por País / Región (Recomendadas por velocidad y estabilidad):
+## 🇵🇪 Listas y Canales de Perú (Abiertos)
 
-- **Perú (190+ Canales):** `https://iptv-org.github.io/iptv/countries/pe.m3u`
-- **Latinoamérica (2,300+ Canales):** `https://iptv-org.github.io/iptv/regions/latam.m3u`
-- **España (400+ Canales):** `https://iptv-org.github.io/iptv/countries/es.m3u`
-- **México (250+ Canales):** `https://iptv-org.github.io/iptv/countries/mx.m3u`
-- **Argentina (180+ Canales):** `https://iptv-org.github.io/iptv/countries/ar.m3u`
-- **Colombia (120+ Canales):** `https://iptv-org.github.io/iptv/countries/co.m3u`
-- **Chile (100+ Canales):** `https://iptv-org.github.io/iptv/countries/cl.m3u`
-- **Estados Unidos:** `https://iptv-org.github.io/iptv/countries/us.m3u`
+| Canal / Fuente | Tipo | URL |
+| :--- | :--- | :--- |
+| **IPTV-Org Perú (190+ Canales)** | `M3U` | `https://iptv-org.github.io/iptv/countries/pe.m3u` |
+| **Latina Televisión en Vivo** | `STREAM` | `https://redirector.rudo.video/hls-video/567ffde3fa319fadf3419efda25619456231dfea/latina/latina.smil/playlist.m3u8` |
+| **Latina Noticias** | `STREAM` | `https://redirector.rudo.video/hls-video/567ffde3fa319fadf3419efda25619456231dfea/latinanoticias/latinanoticias.smil/playlist.m3u8` |
+| **Latina Clásicos** | `STREAM` | `https://redirector.rudo.video/hls-video/plus226/latina2/latina2.smil/playlist.m3u8` |
+| **Exitosa Noticias TV** | `STREAM` | `https://luna-4-video.mediaserver.digital/exitosatv_233b-4b49-a726-5a451262/index.m3u8` |
+| **Radio Uno TV Tacna** | `STREAM` | `https://live-evg7.tv360.bitel.com.pe/bitel/radiounotv/playlist.m3u8` |
 
-### Por Categoría (Ideal para pantalla en el auto):
+---
 
-- **Autos / Motores:** `https://iptv-org.github.io/iptv/categories/auto.m3u`
-- **Deportes:** `https://iptv-org.github.io/iptv/categories/sports.m3u`
-- **Música:** `https://iptv-org.github.io/iptv/categories/music.m3u`
-- **Noticias:** `https://iptv-org.github.io/iptv/categories/news.m3u`
-- **Películas / Cine:** `https://iptv-org.github.io/iptv/categories/movies.m3u`
+## 📦 Listas JSON Estructuradas
 
-### Índices Globales:
+| Fuente | Tipo | URL |
+| :--- | :--- | :--- |
+| **Teleonline TV** | `JSON` | `https://raw.githubusercontent.com/teleonline/listas/main/tv.json` |
+| **TDTChannels TV (España)** | `JSON` | `https://www.tdtchannels.com/lists/tv.json` |
 
-- **Mundial Agrupado por Países:** `https://iptv-org.github.io/iptv/index.country.m3u`
-- **Mundial Agrupado por Categorías:** `https://iptv-org.github.io/iptv/index.category.m3u`
+---
+
+## 🌎 IPTV-Org por Región y Países (Recomendadas por estabilidad)
+
+| Región / País | Tipo | Canales | URL |
+| :--- | :--- | :--- | :--- |
+| **Latinoamérica** | `M3U` | 2,300+ | `https://iptv-org.github.io/iptv/regions/latam.m3u` |
+| **España** | `M3U` | 400+ | `https://iptv-org.github.io/iptv/countries/es.m3u` |
+| **México** | `M3U` | 250+ | `https://iptv-org.github.io/iptv/countries/mx.m3u` |
+| **Argentina** | `M3U` | 180+ | `https://iptv-org.github.io/iptv/countries/ar.m3u` |
+| **Colombia** | `M3U` | 120+ | `https://iptv-org.github.io/iptv/countries/co.m3u` |
+| **Chile** | `M3U` | 100+ | `https://iptv-org.github.io/iptv/countries/cl.m3u` |
+| **Estados Unidos** | `M3U` | 500+ | `https://iptv-org.github.io/iptv/countries/us.m3u` |
+
+---
+
+## 🚗 IPTV-Org Temáticas (Ideales para Car Mode)
+
+| Categoría | Tipo | URL |
+| :--- | :--- | :--- |
+| **Autos & Motor (Especial AutoLari)** | `M3U` | `https://iptv-org.github.io/iptv/categories/auto.m3u` |
+| **Música en Vivo** | `M3U` | `https://iptv-org.github.io/iptv/categories/music.m3u` |
+| **Deportes** | `M3U` | `https://iptv-org.github.io/iptv/categories/sports.m3u` |
+| **Noticias Globales** | `M3U` | `https://iptv-org.github.io/iptv/categories/news.m3u` |
+| **Películas / Cine** | `M3U` | `https://iptv-org.github.io/iptv/categories/movies.m3u` |
+
+---
+
+## 📻 Radios Online en Vivo (Streams Directos)
+
+| Emisora | Género | URL |
+| :--- | :--- | :--- |
+| **Deeva Radio ItaloPower** | Italo Disco / Synth | `https://stream.deevaradio.net:10443/italopower` |
+
+---
+
+## 🌐 Índices Globales IPTV-Org
+
+- **Mundial por Países:** `https://iptv-org.github.io/iptv/index.country.m3u`
+- **Mundial por Categorías:** `https://iptv-org.github.io/iptv/index.category.m3u`
 - **Mundial Completo:** `https://iptv-org.github.io/iptv/index.m3u`
-
-### Peru Lists
-
-- **Radio Uno Tv Tacna** `https://live-evg7.tv360.bitel.com.pe/bitel/radiounotv/playlist.m3u8`
-- **Latina en vivo** `https://redirector.rudo.video/hls-video/567ffde3fa319fadf3419efda25619456231dfea/latina/latina.smil/playlist.m3u8`
-- **Latina Noticias** `https://redirector.rudo.video/hls-video/567ffde3fa319fadf3419efda25619456231dfea/latinanoticias/latinanoticias.smil/playlist.m3u8`
-- **Latina Clasicos** `https://redirector.rudo.video/hls-video/plus226/latina2/latina2.smil/playlist.m3u8`
-- **Exitosa Noticias** `https://luna-4-video.mediaserver.digital/exitosatv_233b-4b49-a726-5a451262/index.m3u8`

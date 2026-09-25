@@ -30,15 +30,40 @@ export const AddSourceModal: React.FC<AddSourceModalProps> = ({
   const [name, setName] = useState<string>('');
   const [url, setUrl] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [loadingSourceUrl, setLoadingSourceUrl] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Lista de fuentes demo y oficiales recomendadas (M3U, JSON, IPTV-Org y Streams Directos)
+  // Lista de fuentes demo y oficiales sincronizadas con LISTS.md
   const DEMO_SOURCES = [
     {
       name: 'IPTV-Org Perú (190+ Canales Abiertos)',
       url: 'https://iptv-org.github.io/iptv/countries/pe.m3u',
       desc: 'Canales nacionales y regionales de Perú (América, Latina, ATV, Bitel TV, Panamericana).',
       type: 'M3U (PE)',
+    },
+    {
+      name: 'Latina Televisión en Vivo (HLS Directo)',
+      url: 'https://redirector.rudo.video/hls-video/567ffde3fa319fadf3419efda25619456231dfea/latina/latina.smil/playlist.m3u8',
+      desc: 'Transmisión oficial de Latina TV Perú en directo y alta resolución.',
+      type: 'STREAM (PE)',
+    },
+    {
+      name: 'Exitosa Noticias TV (HLS Directo)',
+      url: 'https://luna-4-video.mediaserver.digital/exitosatv_233b-4b49-a726-5a451262/index.m3u8',
+      desc: 'Canal informativo peruano en vivo con noticias y debate en tiempo real.',
+      type: 'STREAM (PE)',
+    },
+    {
+      name: 'Teleonline TV (JSON Multi-Canal)',
+      url: 'https://raw.githubusercontent.com/teleonline/listas/main/tv.json',
+      desc: 'Lista estructurada en JSON con decenas de canales en vivo y categorizados.',
+      type: 'JSON',
+    },
+    {
+      name: 'TDTChannels TV (España y Abierto)',
+      url: 'https://www.tdtchannels.com/lists/tv.json',
+      desc: 'Formato JSON oficial con canales generalistas, autonómicos e informativos.',
+      type: 'JSON',
     },
     {
       name: 'IPTV-Org Latinoamérica (2,300+ Canales)',
@@ -53,27 +78,33 @@ export const AddSourceModal: React.FC<AddSourceModalProps> = ({
       type: 'M3U (AUTO)',
     },
     {
-      name: 'Deeva Radio ItaloPower (Stream Radio Directo)',
+      name: 'Deeva Radio ItaloPower (Stream Radio)',
       url: 'https://stream.deevaradio.net:10443/italopower',
-      desc: 'Transmisión continua de radio online en vivo (Icecast / Shoutcast directo en alta fidelidad).',
+      desc: 'Transmisión continua de radio online en vivo (Icecast directo en alta fidelidad).',
       type: 'STREAM',
-    },
-    {
-      name: 'TDTChannels TV (España / Abierto)',
-      url: 'https://www.tdtchannels.com/lists/tv.json',
-      desc: 'Formato JSON oficial con canales generalistas, autonómicos e informativos en abierto.',
-      type: 'JSON',
     },
     {
       name: 'IPTV-Org Música en Vivo (M3U)',
       url: 'https://iptv-org.github.io/iptv/categories/music.m3u',
       desc: 'Más de 700 canales de videoclips, conciertos y música de todos los géneros.',
-      type: 'M3U',
+      type: 'M3U (MÚSICA)',
     },
     {
-      name: 'IPTV-Org Mundial por Países (M3U)',
-      url: 'https://iptv-org.github.io/iptv/index.country.m3u',
-      desc: 'Índice global oficial con más de 10,000 canales estructurados por país.',
+      name: 'IPTV-Org Deportes (M3U)',
+      url: 'https://iptv-org.github.io/iptv/categories/sports.m3u',
+      desc: 'Transmisiones deportivas abiertas de todo el mundo.',
+      type: 'M3U (DEPORTES)',
+    },
+    {
+      name: 'IPTV-Org Noticias Globales (M3U)',
+      url: 'https://iptv-org.github.io/iptv/categories/news.m3u',
+      desc: 'Canales de noticias 24/7 internacionales en español e inglés.',
+      type: 'M3U (NOTICIAS)',
+    },
+    {
+      name: 'IPTV-Org Mundial Completo (M3U)',
+      url: 'https://iptv-org.github.io/iptv/index.m3u',
+      desc: 'Índice global oficial con más de 10,000 canales estructurados.',
       type: 'M3U (GLOBAL)',
     },
   ];
@@ -106,6 +137,31 @@ export const AddSourceModal: React.FC<AddSourceModalProps> = ({
   const handleSelectDemo = (demoUrl: string, demoName: string) => {
     setName(demoName);
     setUrl(demoUrl);
+    setErrorMsg(null);
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+  };
+
+  const handleAddDirect = async (demoUrl: string, demoName: string) => {
+    try {
+      setLoading(true);
+      setLoadingSourceUrl(demoUrl);
+      setErrorMsg(null);
+      if (Platform.OS !== 'web') {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+      await IPTVService.addSource(demoName, demoUrl);
+      setName('');
+      setUrl('');
+      onSourceAdded();
+      onClose();
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Error al procesar la fuente seleccionada.');
+    } finally {
+      setLoading(false);
+      setLoadingSourceUrl(null);
+    }
   };
 
   return (
@@ -187,45 +243,85 @@ export const AddSourceModal: React.FC<AddSourceModalProps> = ({
               </View>
             )}
 
-            {/* Sugerencias Demo Rápidas */}
-            <Text style={styles.sectionSubtitle}>O probar con fuentes abiertas:</Text>
-            {DEMO_SOURCES.map((demo, idx) => (
-              <TouchableOpacity
-                key={idx}
-                style={styles.demoCard}
-                onPress={() => handleSelectDemo(demo.url, demo.name)}
-                activeOpacity={0.7}
-              >
-                <View style={styles.demoCardHeader}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                    <View
-                      style={{
-                        backgroundColor: demo.type === 'JSON' ? 'rgba(0, 229, 255, 0.2)' : 'rgba(255, 145, 0, 0.2)',
-                        paddingHorizontal: 6,
-                        paddingVertical: 2,
-                        borderRadius: 4,
-                        marginRight: 8,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: demo.type === 'JSON' ? AutoTheme.colors.primary : AutoTheme.colors.secondary,
-                          fontSize: 10,
-                          fontWeight: '800',
-                        }}
-                      >
-                        {demo.type}
+            {/* Sugerencias Demo Rápidas con Doble Acción */}
+            <Text style={styles.sectionSubtitle}>Fuentes abiertas y canales sugeridos:</Text>
+            {DEMO_SOURCES.map((demo, idx) => {
+              const isThisLoading = loading && loadingSourceUrl === demo.url;
+              const isPeru = demo.type.includes('PE');
+              const isJson = demo.type === 'JSON';
+              const isStream = demo.type.includes('STREAM');
+
+              const badgeBg = isJson
+                ? 'rgba(0, 229, 255, 0.15)'
+                : isStream
+                ? 'rgba(0, 230, 118, 0.15)'
+                : isPeru
+                ? 'rgba(255, 68, 68, 0.15)'
+                : 'rgba(255, 145, 0, 0.15)';
+
+              const badgeColor = isJson
+                ? AutoTheme.colors.primary
+                : isStream
+                ? AutoTheme.colors.accentGreen
+                : isPeru
+                ? '#FF5252'
+                : AutoTheme.colors.secondary;
+
+              return (
+                <View key={idx} style={styles.demoCard}>
+                  <View style={styles.demoCardHeader}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                      <View style={[styles.demoTypeBadge, { backgroundColor: badgeBg }]}>
+                        <Text style={[styles.demoTypeBadgeText, { color: badgeColor }]}>
+                          {demo.type}
+                        </Text>
+                      </View>
+                      <Text style={styles.demoCardTitle} numberOfLines={1}>
+                        {demo.name}
                       </Text>
                     </View>
-                    <Text style={styles.demoCardTitle} numberOfLines={1}>
-                      {demo.name}
-                    </Text>
                   </View>
-                  <Ionicons name="arrow-forward-circle" size={20} color={AutoTheme.colors.primary} />
+
+                  <Text style={styles.demoCardDesc}>{demo.desc}</Text>
+
+                  {/* Dos botones de acción: Cargar vs Descargar y Procesar */}
+                  <View style={styles.demoCardActions}>
+                    <TouchableOpacity
+                      style={styles.cardLoadBtn}
+                      onPress={() => handleSelectDemo(demo.url, demo.name)}
+                      disabled={loading}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons name="clipboard-outline" size={14} color={AutoTheme.colors.textSecondary} />
+                      <Text style={styles.cardLoadBtnText}>Cargar</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[
+                        styles.cardDirectBtn,
+                        isThisLoading && styles.cardDirectBtnLoading,
+                        loading && !isThisLoading && styles.btnDisabled,
+                      ]}
+                      onPress={() => handleAddDirect(demo.url, demo.name)}
+                      disabled={loading}
+                      activeOpacity={0.8}
+                    >
+                      {isThisLoading ? (
+                        <>
+                          <ActivityIndicator size="small" color="#000" />
+                          <Text style={styles.cardDirectBtnText}>Procesando...</Text>
+                        </>
+                      ) : (
+                        <>
+                          <Ionicons name="cloud-download-outline" size={15} color="#000" />
+                          <Text style={styles.cardDirectBtnText}>Descargar y procesar</Text>
+                        </>
+                      )}
+                    </TouchableOpacity>
+                  </View>
                 </View>
-                <Text style={styles.demoCardDesc}>{demo.desc}</Text>
-              </TouchableOpacity>
-            ))}
+              );
+            })}
           </ScrollView>
 
           {/* Botones de Acción */}
@@ -390,17 +486,72 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
+  },
+  demoTypeBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  demoTypeBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   demoCardTitle: {
     color: '#FFF',
     fontSize: 13,
     fontWeight: '700',
+    flex: 1,
   },
   demoCardDesc: {
     color: AutoTheme.colors.textSecondary,
     fontSize: 11,
     lineHeight: 15,
+    marginBottom: 8,
+  },
+  demoCardActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.07)',
+    gap: 8,
+  },
+  cardLoadBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: AutoTheme.colors.surfaceCard,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: AutoTheme.borderRadius.sm,
+    borderWidth: 1,
+    borderColor: AutoTheme.colors.border,
+    gap: 5,
+  },
+  cardLoadBtnText: {
+    color: AutoTheme.colors.textSecondary,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  cardDirectBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: AutoTheme.colors.primary,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: AutoTheme.borderRadius.sm,
+    gap: 6,
+  },
+  cardDirectBtnLoading: {
+    opacity: 0.85,
+  },
+  cardDirectBtnText: {
+    color: '#000',
+    fontSize: 12,
+    fontWeight: '800',
   },
   footer: {
     flexDirection: 'row',
