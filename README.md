@@ -53,14 +53,9 @@ npx expo start
 ## 📦 Compilación y Despliegue
 
 ### 1. Versión Web (GitHub Pages / `autolari.larico.net`)
-Genera la carpeta `dist/` con `CNAME`, `.nojekyll` y fallback `404.html`:
+Compilar y subir a GitHub Pages en un solo comando:
 ```bash
-npm run build:web
-```
-
-Subir directamente a GitHub Pages:
-```bash
-npx -y gh-pages -d dist -t true
+npm run deploy:web
 ```
 
 ### 2. Generar APK para Android
