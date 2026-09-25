@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Platform } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Platform, Image } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { AutoTheme } from '../../core/theme';
 import * as Haptics from 'expo-haptics';
@@ -30,13 +30,11 @@ export const Header: React.FC<HeaderProps> = ({
     <View style={[styles.container, isCarMode && styles.carContainer]}>
       {/* Brand & Title */}
       <View style={styles.brandRow}>
-        <View style={styles.logoBadge}>
-          <MaterialCommunityIcons
-            name="car-connected"
-            size={isCarMode ? 28 : 22}
-            color={AutoTheme.colors.primary}
-          />
-        </View>
+        <Image
+          source={require('../../../assets/logo.png')}
+          style={[styles.logoBadge, isCarMode && styles.carLogoBadge]}
+          resizeMode="cover"
+        />
         <View>
           <Text style={[styles.brandTitle, isCarMode && styles.carBrandTitle]}>
             AUTO<Text style={{ color: AutoTheme.colors.primary }}>LARI</Text>
@@ -119,13 +117,14 @@ const styles = StyleSheet.create({
   logoBadge: {
     width: 38,
     height: 38,
-    borderRadius: 10,
-    backgroundColor: AutoTheme.colors.surfaceCard,
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderRadius: 8,
     marginRight: 10,
-    borderWidth: 1,
-    borderColor: AutoTheme.colors.border,
+  },
+  carLogoBadge: {
+    width: 46,
+    height: 46,
+    borderRadius: 10,
+    marginRight: 12,
   },
   brandTitle: {
     fontSize: 20,

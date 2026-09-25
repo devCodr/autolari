@@ -38,4 +38,12 @@ if (fs.existsSync(indexPath)) {
 fs.writeFileSync(path.join(distDir, '.gitignore'), '!*\n!**/*\n!node_modules/\n!**/node_modules/**\n', 'utf8');
 console.log('✓ .gitignore optimizado en dist');
 
+// 6. Copiar favicon oficial a dist
+const faviconSource = path.join(__dirname, '..', 'assets', 'favicon.png');
+if (fs.existsSync(faviconSource)) {
+  fs.copyFileSync(faviconSource, path.join(distDir, 'favicon.ico'));
+  fs.copyFileSync(faviconSource, path.join(distDir, 'favicon.png'));
+  console.log('✓ Favicon oficial copiado a dist');
+}
+
 console.log('🎉 Build web listo para publicar en GitHub Pages (autolari.larico.net)!');
