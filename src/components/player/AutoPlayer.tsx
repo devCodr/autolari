@@ -42,8 +42,9 @@ export const AutoPlayer: React.FC<AutoPlayerProps> = ({
   const [showControls, setShowControls] = useState<boolean>(true);
   const controlsTimeoutRef = useRef<any>(null);
 
-  // Referencias para reproducción Hls.js en Web
+  // Referencias para reproducción Hls.js y Audio en Web
   const webVideoRef = useRef<any>(null);
+  const webAudioRef = useRef<any>(null);
   const hlsRef = useRef<any>(null);
   const [isPlayingWeb, setIsPlayingWeb] = useState<boolean>(true);
 
@@ -157,7 +158,46 @@ export const AutoPlayer: React.FC<AutoPlayerProps> = ({
     };
   }, [channel.streamUrl, channel.mediaType, retryCount]);
 
-  // Animación de onda de radio
+  // Reproductor nativo HTML5 Audio en Web para radios en vivo (Icecast, Shoutcast, MP3, AAC)
+  useEffect(() => {
+    if (Platform.OS !== 'web' || channel.mediaType !== 'radio') return;
+
+    const audio = webAudioRef.current;
+    if (!audio) return;
+
+    setHasError(null);
+    audio.src = channel.streamUrl;
+    audio.load();
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => setIsPlayingWeb(true))
+        .catch((playErr: any) => {
+          console.log('[AutoPlayer Web Audio] Autoplay bloqueado por navegador:', playErr);
+          setIsPlayingWeb(false);
+        });
+    }
+
+    const onPlay = () => setIsPlayingWeb(true);
+    const onPause = () => setIsPlayingWeb(false);
+    const onError = () => setHasError('No se pudo conectar a la transmisión de radio.');
+
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
+    audio.addEventListener('error', onError);
+
+    return () => {
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('pause', onPause);
+      audio.removeEventListener('error', onError);
+      try {
+        audio.pause();
+        audio.src = '';
+      } catch (e) {}
+    };
+  }, [channel.streamUrl, channel.mediaType, retryCount]);
+
+  // Animación de onda de radio (useNativeDriver solo en nativo, no en web)
   useEffect(() => {
     if (channel.mediaType === 'radio') {
       Animated.loop(
@@ -165,12 +205,12 @@ export const AutoPlayer: React.FC<AutoPlayerProps> = ({
           Animated.timing(waveAnim, {
             toValue: 1,
             duration: 700,
-            useNativeDriver: true,
+            useNativeDriver: Platform.OS !== 'web',
           }),
           Animated.timing(waveAnim, {
             toValue: 0.3,
             duration: 700,
-            useNativeDriver: true,
+            useNativeDriver: Platform.OS !== 'web',
           }),
         ])
       ).start();
@@ -217,13 +257,16 @@ export const AutoPlayer: React.FC<AutoPlayerProps> = ({
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    if (Platform.OS === 'web' && webVideoRef.current) {
-      if (webVideoRef.current.paused) {
-        webVideoRef.current.play();
-        setIsPlayingWeb(true);
-      } else {
-        webVideoRef.current.pause();
-        setIsPlayingWeb(false);
+    if (Platform.OS === 'web') {
+      const media = channel.mediaType === 'radio' ? webAudioRef.current : webVideoRef.current;
+      if (media) {
+        if (media.paused) {
+          media.play().catch(() => {});
+          setIsPlayingWeb(true);
+        } else {
+          media.pause();
+          setIsPlayingWeb(false);
+        }
       }
       return;
     }
@@ -245,10 +288,17 @@ export const AutoPlayer: React.FC<AutoPlayerProps> = ({
   const handleRetry = () => {
     setHasError(null);
     setRetryCount((prev) => prev + 1);
-    if (Platform.OS !== 'web') {
-      player.replace(channel.streamUrl);
-      player.play();
+    if (Platform.OS === 'web') {
+      const media = channel.mediaType === 'radio' ? webAudioRef.current : webVideoRef.current;
+      if (media) {
+        media.src = channel.streamUrl;
+        media.load();
+        media.play().catch(() => {});
+      }
+      return;
     }
+    player.replace(channel.streamUrl);
+    player.play();
   };
 
   const isRadio = channel.mediaType === 'radio';
@@ -312,6 +362,15 @@ export const AutoPlayer: React.FC<AutoPlayerProps> = ({
           </Animated.View>
           <Text style={styles.radioBadge}>STREAM DE AUDIO EN VIVO</Text>
         </View>
+      )}
+
+      {/* Elemento de audio HTML5 para reproducción web de radio */}
+      {Platform.OS === 'web' && (
+        <audio
+          ref={webAudioRef}
+          playsInline
+          style={{ display: 'none' }}
+        />
       )}
 
       {/* Superposición de Error */}
