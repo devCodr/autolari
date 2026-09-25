@@ -34,4 +34,8 @@ if (fs.existsSync(indexPath)) {
   console.log('✓ 404.html creado para fallback SPA');
 }
 
+// 5. Crear .gitignore en dist para que git nunca ignore las fuentes en assets/node_modules
+fs.writeFileSync(path.join(distDir, '.gitignore'), '!*\n!**/*\n!node_modules/\n!**/node_modules/**\n', 'utf8');
+console.log('✓ .gitignore optimizado en dist');
+
 console.log('🎉 Build web listo para publicar en GitHub Pages (autolari.larico.net)!');
