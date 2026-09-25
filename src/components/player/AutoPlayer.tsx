@@ -41,6 +41,7 @@ export const AutoPlayer: React.FC<AutoPlayerProps> = ({
   const [retryCount, setRetryCount] = useState<number>(0);
   const [showControls, setShowControls] = useState<boolean>(true);
   const controlsTimeoutRef = useRef<any>(null);
+  const isRadio = channel.mediaType === 'radio';
 
   // Referencias para reproducción Hls.js y Audio en Web
   const webVideoRef = useRef<any>(null);
@@ -235,11 +236,11 @@ export const AutoPlayer: React.FC<AutoPlayerProps> = ({
     }
   }, [channel]);
 
-  // Auto-ocultar controles después de 4 segundos
+  // Auto-ocultar controles después de 4.5 segundos solo en modo video (en radio se mantienen siempre visibles)
   const resetControlsTimer = () => {
     setShowControls(true);
     if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-    if (!isCarMode) {
+    if (!isCarMode && !isRadio) {
       controlsTimeoutRef.current = setTimeout(() => {
         setShowControls(false);
       }, 4500);
@@ -251,7 +252,7 @@ export const AutoPlayer: React.FC<AutoPlayerProps> = ({
     return () => {
       if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
     };
-  }, [isCarMode]);
+  }, [isCarMode, isRadio]);
 
   const togglePlay = () => {
     if (Platform.OS !== 'web') {
@@ -301,7 +302,6 @@ export const AutoPlayer: React.FC<AutoPlayerProps> = ({
     player.play();
   };
 
-  const isRadio = channel.mediaType === 'radio';
   const isPlaying = Platform.OS === 'web' ? isPlayingWeb : player.playing;
 
   return (
@@ -337,7 +337,11 @@ export const AutoPlayer: React.FC<AutoPlayerProps> = ({
           )}
         </TouchableOpacity>
       ) : (
-        <View style={styles.radioVisualizerContainer}>
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={togglePlay}
+          style={styles.radioVisualizerContainer}
+        >
           <LinearGradient
             colors={['#0F172A', '#080A0E']}
             style={StyleSheet.absoluteFill}
@@ -361,7 +365,7 @@ export const AutoPlayer: React.FC<AutoPlayerProps> = ({
             />
           </Animated.View>
           <Text style={styles.radioBadge}>STREAM DE AUDIO EN VIVO</Text>
-        </View>
+        </TouchableOpacity>
       )}
 
       {/* Elemento de audio HTML5 para reproducción web de radio */}
@@ -386,8 +390,8 @@ export const AutoPlayer: React.FC<AutoPlayerProps> = ({
         </View>
       )}
 
-      {/* Controles del Reproductor (Mobile & Car Mode) */}
-      {(showControls || isCarMode) && (
+      {/* Controles del Reproductor (Permanentes en Radio o Car Mode, auto-ocultables en Video) */}
+      {(showControls || isCarMode || isRadio) && (
         <LinearGradient
           colors={['rgba(0,0,0,0.85)', 'transparent', 'rgba(0,0,0,0.92)']}
           style={[styles.controlsOverlay, isCarMode && styles.carControlsOverlay]}
