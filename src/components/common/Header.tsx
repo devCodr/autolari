@@ -33,7 +33,7 @@ export const Header: React.FC<HeaderProps> = ({
         <Image
           source={require('../../../assets/logo.png')}
           style={[styles.logoBadge, isCarMode && styles.carLogoBadge]}
-          resizeMode="cover"
+          resizeMode="contain"
         />
         <View>
           <Text style={[styles.brandTitle, isCarMode && styles.carBrandTitle]}>
